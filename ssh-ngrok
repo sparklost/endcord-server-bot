@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ "${1:-}" == "--stop" ]]; then
+    pkill sshd
+    pkill ngrok
+else
+    sshd
+    # ngrok tcp 2121 --log=stdout > ~/.config/ngrok/ngrok.log 2>&1 &
+    proot -b $PREFIX/etc/resolv.conf:/etc/resolv.conf ngrok tcp 22 --log=stdout > ~/.config/ngrok/ngrok.log 2>&1 &
+
+    for i in $(seq 1 20); do
+        sleep 0.5
+        ADDR=$(curl -s http://127.0.0.1:4040/api/tunnels \
+            | grep -o '"public_url":"[^"]*"' \
+            | head -1 \
+            | sed 's/"public_url":"//;s/"//')
+        [[ -n "$ADDR" ]] && break
+    done
+
+    HOST=$(echo "$ADDR" | sed 's|tcp://||' | cut -d: -f1)
+    PORT=$(echo "$ADDR" | sed 's|tcp://||' | cut -d: -f2)
+    echo "Address: \`$HOST\`"
+    echo "Port: \`$PORT\`"
+    echo "Username: \`$USER\`"
+fi

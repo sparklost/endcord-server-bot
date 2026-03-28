@@ -1,0 +1,83 @@
+[
+  {
+    "name": "ping",
+    "type": 1,
+    "description": "Replies with Pong!"
+  },
+  {
+    "name": "system-stats",
+    "type": 1,
+    "description": "Show system stats"
+  },
+  {
+    "name": "nom",
+    "type": 1,
+    "description": "Eat one mooncake!"
+  },
+  {
+    "name": "mooncakes",
+    "type": 1,
+    "description": "Show number of owned mooncakes"
+  },
+  {
+    "name": "top-mooncakers",
+    "type": 1,
+    "description": "Show top 10 mooncake holders"
+  },
+  {
+    "name": "give",
+    "description": "Give member a mooncake",
+    "options": [
+      {
+        "name": "user",
+        "description": "The user to give to",
+        "type": 6,
+        "required": true
+      },
+      {
+        "name": "number",
+        "description": "The number to give",
+        "type": 4,
+        "required": false
+      }
+    ]
+  },
+  {
+    "name": "ssh",
+    "description": "Manage server ssh daemon states",
+    "options": [
+      {
+        "name": "tor",
+        "description": "Start/Stop TOR ssh daemon",
+        "type": 3,
+        "required": false,
+        "choices": [
+          {
+            "name": "start",
+            "value": "start"
+          },
+          {
+            "name": "stop",
+            "value": "stop"
+          }
+        ]
+      },
+      {
+        "name": "ngrok",
+        "description": "Start/Stop ngrok ssh daemon",
+        "type": 3,
+        "required": false,
+        "choices": [
+          {
+            "name": "start",
+            "value": "start"
+          },
+          {
+            "name": "stop",
+            "value": "stop"
+          }
+        ]
+      }
+    ]
+  }
+]
