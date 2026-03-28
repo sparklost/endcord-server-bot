@@ -11,7 +11,7 @@ from endcord import peripherals, utils
 import stats
 
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.1"
+EXT_VERSION = "0.1.2"
 EXT_ENDCORD_VERSION = "1.4.2"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
@@ -78,6 +78,8 @@ class Extension:
         prev_percentage = 0
         while self.run:
             status, percentage, _, _, _ = stats.get_termux_battery()
+            if status is None:
+                return
             if prev_status != status:
                 prev_status = status
                 if status == "Discharging":
