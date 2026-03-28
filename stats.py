@@ -64,6 +64,6 @@ def get_termux_battery():
     try:
         result = subprocess.run(["termux-battery-status"], capture_output=True, text=True, check=True)
         data = json.loads(result.stdout)
-        return data["status"].capitalize(), data.get("percentage", 0), round(data.get("voltage", 0) / 1000, 2), int(data.get("current, 0") / 1000), data.get("temperature", 0)
+        return data["status"].capitalize(), data.get("percentage", 0), round(data.get("voltage", 0) / 1000, 2), int(data.get("current", 0) / 1000), data.get("temperature", 0)
     except Exception:
         return None, None, None, None, None
