@@ -8,7 +8,7 @@ if [[ "${1:-}" == "--stop" ]]; then
 else
     sshd
     # ngrok tcp 2121 --log=stdout > ~/.config/ngrok/ngrok.log 2>&1 &
-    proot -b $PREFIX/etc/resolv.conf:/etc/resolv.conf ngrok tcp 22 --log=stdout > ~/.config/ngrok/ngrok.log 2>&1 &
+    proot -b $PREFIX/etc/resolv.conf:/etc/resolv.conf ngrok tcp 2121 --log=stdout > ~/.config/ngrok/ngrok.log 2>&1 &
 
     for i in $(seq 1 20); do
         sleep 0.5
@@ -23,5 +23,5 @@ else
     PORT=$(echo "$ADDR" | sed 's|tcp://||' | cut -d: -f2)
     echo "Address: \`$HOST\`"
     echo "Port: \`$PORT\`"
-    echo "Username: \`$USER\`"
+    echo "Username: \`$USERNAME\`"
 fi

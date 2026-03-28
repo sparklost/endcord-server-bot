@@ -21,7 +21,7 @@ EXT_COMMAND_ASSIST = (
 logger = logging.getLogger(__name__)
 
 THANKYOUS = ("thank you", "thankyou", "thanks", "ty", "tysm", "thx", "tnx", "tyy", "thanx")
-
+BATTERY_CHECK_INTERVAL = 10 * 60
 # extra deps: apsw psycopg[binary,pool]
 
 class Extension:
@@ -39,6 +39,7 @@ class Extension:
 
         self.guild_id = app.config.get("ext_endcord_bot_guild_id", None)
         self.admin_id = app.config.get("ext_endcord_bot_admin_id", None)
+        self.alerts_channel = app.config.get("ext_endcord_bot_alerts_channel_id", None)
         self.mooncake_cooldown = app.config.get("ext_endcord_bot_mooncake_cooldown", 15) * 60   # default 15 min
 
         if app.config.get("ext_endcord_bot_db_postgresql_host", None):
@@ -58,6 +59,9 @@ class Extension:
             database_path = os.path.join(database_path, "discord.db")
             self.mooncakes_db = database_sqlite.MooncakeStore(database_path)
 
+        if app.config.get("ext_endcord_bot_monitor_battery") and self.alerts_channel:
+            threading.Thread(target=self.battery_watcher, daemon=True).start()
+
         extension_dir = os.path.dirname(os.path.abspath(__file__))
         self.commands = utils.load_json("commands.json", dir_path=extension_dir)
         # self.command_perms = utils.load_json("command_perms.json", dir_path=extension_dir)
@@ -66,6 +70,38 @@ class Extension:
         self.start_time = int(time.time())
 
         threading.Thread(target=self.bot, daemon=True).start()
+
+
+    def battery_watcher(self):
+        """Periodically check battery state and send warning to alerts channel"""
+        prev_status = "Charging"
+        prev_percentage = 0
+        while self.run:
+            status, percentage, _, _, _ = stats.get_termux_battery()
+            if prev_status != status:
+                prev_status = status
+                if status == "Discharging":
+                    self.app.discord.send_message(
+                        self.alerts_channel,
+                        "**WARNING: Power supply is disconnected! Server is now running on battery!**",
+                    )
+            if percentage <= 30 and prev_percentage > 30:
+                self.app.discord.send_message(
+                    self.alerts_channel,
+                    "**WARNING: Power supply is disconnected! Less than 30% battery remaining!**",
+                )
+            elif percentage <= 10 and prev_percentage > 10:
+                self.app.discord.send_message(
+                    self.alerts_channel,
+                    "**WARNING: Power supply is disconnected! Less than 10% battery remaining!**",
+                )
+            elif percentage <= 5 and prev_percentage > 5:
+                self.app.discord.send_message(
+                    self.alerts_channel,
+                    "**WARNING: Power supply is disconnected! Less than 5% battery remaining!**",
+                )
+            prev_percentage = percentage
+            time.sleep(BATTERY_CHECK_INTERVAL)
 
 
     def on_execute_command(self, command_text, chat_sel, tree_sel):   # noqa
@@ -161,14 +197,14 @@ class Extension:
                     ram_used, ram_total, cpu_used, ping, uptime = stats.get_system_stats()
                     text = f"RAM usage: `{ram_used}/{ram_total} MB`\n"
                     if cpu_used is not None:
-                        text += "CPU usage: `{cpu_used}%`\n"
+                        text += f"CPU usage: `{cpu_used}%`\n"
                     else:
                         text += "CPU usage: `unknown`\n"
-                    text += "Ping: `{ping} ms` (1.1.1.1)\n"
-                    text += "Uptime: `{uptime}`"
+                    text += f"Ping: `{ping} ms` (1.1.1.1)\n"
+                    text += f"Uptime: `{uptime}`"
                     bat_status, bat_percentage, bat_voltage, bat_current, bat_temperature = stats.get_termux_battery()
                     if bat_status:
-                        text += f"\nBattery: {bat_status} {bat_percentage}%; {bat_voltage} V; {bat_current} mA; {bat_temperature} °C"
+                        text += f"\nBattery: {bat_status}; {bat_percentage}%; {bat_voltage} V; {bat_current} mA; {bat_temperature} °C"
                     self.app.discord.bot_edit_interaction({"content": text}, interaction_token)
 
                 elif command_name == "nom":
