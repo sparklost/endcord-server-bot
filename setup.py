@@ -13,10 +13,11 @@ LIBRARIES = (
 def termux_install_apsw():
     """Setup apsw on termux"""
     lib = "apsw"
-    subprocess.run(["pkg", "i", f"python-{lib}"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if not shutil.which("apsw"):
+        subprocess.run(["pkg", "i", f"python-{lib}"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     current_dir = os.getcwd()
     system_dir = glob.glob(os.path.expandvars("$PREFIX/lib/python*/site-packages"))[0]
-    shutil.move(os.path.join(system_dir, lib), os.path.join(current_dir, lib))
+    shutil.copy(os.path.join(system_dir, lib), os.path.join(current_dir, lib))
 
 
 def main():
