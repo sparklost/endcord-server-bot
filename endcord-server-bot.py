@@ -11,7 +11,7 @@ from endcord import peripherals, utils
 import stats
 
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.0"
+EXT_VERSION = "0.1.1"
 EXT_ENDCORD_VERSION = "1.4.2"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
@@ -159,7 +159,13 @@ class Extension:
                     response = {"content": "Gathering data..."}
                     self.app.discord.bot_respond_interaction(5, response, interaction_id, interaction_token)   # DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
                     ram_used, ram_total, cpu_used, ping, uptime = stats.get_system_stats()
-                    text = f"RAM usage: `{ram_used}/{ram_total} MB`\nCPU usage: `{cpu_used}%`\nPing: `{ping} ms` (1.1.1.1)\nUptime: `{uptime}`"
+                    text = f"RAM usage: `{ram_used}/{ram_total} MB`\n"
+                    if cpu_used is not None:
+                        text += "CPU usage: `{cpu_used}%`\n"
+                    else:
+                        text += "CPU usage: `unknown`\n"
+                    text += "Ping: `{ping} ms` (1.1.1.1)\n"
+                    text += "Uptime: `{uptime}`"
                     bat_status, bat_percentage, bat_voltage, bat_current, bat_temperature = stats.get_termux_battery()
                     if bat_status:
                         text += f"\nBattery: {bat_status} {bat_percentage}%; {bat_voltage} V; {bat_current} mA; {bat_temperature} °C"
