@@ -71,7 +71,7 @@ class Extension:
         self.start_time = int(time.time())
 
         self.ui = True
-        if app.config.get("ext_endcord_server_bot_ui", True):
+        if not app.config.get("ext_endcord_server_bot_ui", True):
             if self.ui:
                 self.app.tui.pause_curses()
             else:
