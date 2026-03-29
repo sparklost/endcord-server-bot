@@ -26,13 +26,14 @@ After updating `commands.json` run bot inside endcord, and run `bot_register_com
 Note that there is a limit of 200 command registrations per day.  
 
 ### Settings options
-- `ext_endcord_bot_guild_id = None`  
-- `ext_endcord_bot_admin_id = None`  
-- `ext_endcord_bot_mooncake_cooldown = 15`  
-- `ext_endcord_bot_db_postgresql_host = None`  
-- `ext_endcord_bot_db_postgresql_user = "user"`  
-- `ext_endcord_bot_db_postgresql_password = "password"`  
-- `ext_endcord_bot_db_dir_path = None`  
+- `ext_endcord_server_bot_guild_id = None`  
+- `ext_endcord_server_bot_admin_id = None`  
+- `ext_endcord_server_bot_mooncake_cooldown = 15`  
+- `ext_endcord_server_bot_ui = True`  
+- `ext_endcord_server_bot_db_postgresql_host = None`  
+- `ext_endcord_server_bot_db_postgresql_user = "user"`  
+- `ext_endcord_server_bot_db_postgresql_password = "password"`  
+- `ext_endcord_server_bot_db_dir_path = None`  
 
 
 ## Disclaimer

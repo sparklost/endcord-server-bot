@@ -17,6 +17,7 @@ EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
 EXT_COMMAND_ASSIST = (
     ("bot_register_commands - register all bot commands from commands.json", "bot_register_commands"),
+    ("bot_toggle_ui - toggle UI drawing", "bot_toggle_ui"),
 )
 logger = logging.getLogger(__name__)
 
@@ -37,20 +38,20 @@ class Extension:
             del (type(self).on_execute_command, type(self).on_message_event, type(self).on_message_event_is_irrelevant)
             return
 
-        self.guild_id = app.config.get("ext_endcord_bot_guild_id", None)
-        self.admin_id = app.config.get("ext_endcord_bot_admin_id", None)
-        self.alerts_channel = app.config.get("ext_endcord_bot_alerts_channel_id", None)
-        self.mooncake_cooldown = app.config.get("ext_endcord_bot_mooncake_cooldown", 15) * 60   # default 15 min
+        self.guild_id = app.config.get("ext_endcord_server_bot_guild_id", None)
+        self.admin_id = app.config.get("ext_endcord_server_bot_admin_id", None)
+        self.alerts_channel = app.config.get("ext_endcord_server_bot_alerts_channel_id", None)
+        self.mooncake_cooldown = app.config.get("ext_endcord_server_bot_mooncake_cooldown", 15) * 60   # default 15 min
 
-        if app.config.get("ext_endcord_bot_db_postgresql_host", None):
+        if app.config.get("ext_endcord_server_bot_db_postgresql_host", None):
             import database_postgres
-            host = app.config.get("ext_endcord_bot_db_postgresql_host")
-            user = app.config.get("ext_endcord_bot_db_postgresql_user", "user")
-            password = app.config.get("ext_endcord_bot_db_postgresql_password", "password")
+            host = app.config.get("ext_endcord_server_bot_db_postgresql_host")
+            user = app.config.get("ext_endcord_server_bot_db_postgresql_user", "user")
+            password = app.config.get("ext_endcord_server_bot_db_postgresql_password", "password")
             self.mooncakes_db = database_postgres.MooncakeStore(host, user, password, "mooncake-store")
         else:
             import database_sqlite
-            database_path = app.config.get("ext_endcord_bot_db_dir_path")
+            database_path = app.config.get("ext_endcord_server_bot_db_dir_path")
             if not database_path:
                 database_path = f"{os.path.expanduser(peripherals.config_path)}/db/"
             database_path = os.path.expanduser(database_path)
@@ -59,7 +60,7 @@ class Extension:
             database_path = os.path.join(database_path, "discord.db")
             self.mooncakes_db = database_sqlite.MooncakeStore(database_path)
 
-        if app.config.get("ext_endcord_bot_monitor_battery") and self.alerts_channel:
+        if app.config.get("ext_endcord_server_bot_monitor_battery") and self.alerts_channel:
             threading.Thread(target=self.battery_watcher, daemon=True).start()
 
         extension_dir = os.path.dirname(os.path.abspath(__file__))
@@ -68,6 +69,14 @@ class Extension:
         self.cooldown = {}
         self.members_nonce = None
         self.start_time = int(time.time())
+
+        self.ui = True
+        if app.config.get("ext_endcord_server_bot_ui", True):
+            if self.ui:
+                self.app.tui.pause_curses()
+            else:
+                self.app.tui.resume_curses()
+            self.ui = not self.ui
 
         threading.Thread(target=self.bot, daemon=True).start()
 
@@ -121,6 +130,12 @@ class Extension:
                 time.sleep(2)   # to not get rate_limited
             self.app.update_extra_line()
             return True
+        if command_text.startswith("bot_toggle_ui"):
+            if self.ui:
+                self.app.tui.pause_curses()
+            else:
+                self.app.tui.resume_curses()
+            self.ui = not self.ui
         return False
 
 
