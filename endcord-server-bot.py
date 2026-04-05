@@ -12,7 +12,7 @@ import stats
 
 # extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.2"
+EXT_VERSION = "0.1.3"
 EXT_ENDCORD_VERSION = "1.4.2"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
