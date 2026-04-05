@@ -181,7 +181,8 @@ class Extension:
             else:
                 self.cooldown[user_id] = int(time.time())
 
-            self.mooncakes_db.increment(mention["id"])
+            if user_id != self.admin_id:
+                self.mooncakes_db.increment(mention["id"])
             name = mention.get("global_name")
             if not name:
                 name = mention.get("username")
