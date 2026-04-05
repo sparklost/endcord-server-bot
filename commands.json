@@ -1,15 +1,5 @@
 [
   {
-    "name": "ping",
-    "type": 1,
-    "description": "Replies with Pong!"
-  },
-  {
-    "name": "system-stats",
-    "type": 1,
-    "description": "Show system stats"
-  },
-  {
     "name": "nom",
     "type": 1,
     "description": "Eat one mooncake!"
@@ -41,6 +31,21 @@
         "required": false
       }
     ]
+  },
+  {
+    "name": "ping",
+    "type": 1,
+    "description": "Replies with Pong!"
+  },
+  {
+    "name": "system-stats",
+    "type": 1,
+    "description": "Show system stats"
+  },
+  {
+    "name": "client-stats",
+    "type": 1,
+    "description": "Show client stats"
   },
   {
     "name": "ssh",

@@ -6,10 +6,11 @@ import subprocess
 import threading
 import time
 
-from endcord import peripherals, utils
+from endcord import formatter, peripherals, utils
 
 import stats
 
+# extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
 EXT_VERSION = "0.1.2"
 EXT_ENDCORD_VERSION = "1.4.2"
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 THANKYOUS = ("thank you", "thankyou", "thanks", "ty", "tysm", "thx", "tnx", "tyy", "thanx")
 BATTERY_CHECK_INTERVAL = 10 * 60
-# extra deps: apsw psycopg[binary,pool]
+
 
 class Extension:
     """Main extension class"""
@@ -223,6 +224,29 @@ class Extension:
                     if bat_status:
                         text += f"\nBattery: {bat_status}; {bat_percentage}%; {bat_voltage} V; {bat_current} mA; {bat_temperature} °C"
                     self.app.discord.bot_edit_interaction({"content": text}, interaction_token)
+
+                elif command_name == "client-stats":
+                    response = {"content": "Gathering data..."}
+                    self.app.discord.bot_respond_interaction(5, response, interaction_id, interaction_token)   # DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+                    gateway_events_per_h, gateway_msg_per_h, gateway_ping_time, messages_buffer_size, members_count = self.app.gateway.get_stats()
+                    total_requests, api_ping_time = self.app.discord.get_stats()
+                    deleted_msg_count = 0
+                    for channel in self.app.deleted_cache:
+                        deleted_msg_count += len(channel["messages"])
+                    summaries_count = 0
+                    for guild in self.app.summaries:
+                        for channel in guild["channels"]:
+                            summaries_count += len(channel["summaries"])
+                    pfps_count, pfps_size = utils.get_dir_size(os.path.expanduser(peripherals.cache_path), mb=True)
+                    text = f"Run time: {formatter.format_seconds(int(time.time()) - self.app.start_time, nice=True)}\n"
+                    text += f"Gateway events/h: `{gateway_events_per_h}`\n"
+                    text += f"Gateway messages/h: `{gateway_msg_per_h}`\n"
+                    text += f"Gateway ping time: `{gateway_ping_time} s`\n"
+                    text += f"Message buffer size: `{messages_buffer_size}`\n"
+                    text += f"Total API requests: `{total_requests}`\n"
+                    text += f"API response time: `{api_ping_time} s`\n"
+                    text += f"Cached members: `{members_count}`\n"
+                    self.app.discord.bot_edit_interaction({"content": text.strip()}, interaction_token)
 
                 elif command_name == "nom":
                     name = interaction["member"].get("nick")
