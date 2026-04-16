@@ -12,7 +12,7 @@ import stats
 
 # extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.3"
+EXT_VERSION = "0.1.4"
 EXT_ENDCORD_VERSION = "1.4.2"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
@@ -23,7 +23,11 @@ EXT_COMMAND_ASSIST = (
 logger = logging.getLogger(__name__)
 
 THANKYOUS = ("thank you", "thankyou", "thanks", "ty", "tysm", "thx", "tnx", "tyy", "thanx")
+THANKYOUS_REGEX = [r"\bthank you\b"]
 BATTERY_CHECK_INTERVAL = 10 * 60
+
+for i, regex in enumerate(THANKYOUS_REGEX):
+    THANKYOUS_REGEX[i] = re.compile(regex, re.IGNORECASE)
 
 
 class Extension:
@@ -159,10 +163,17 @@ class Extension:
             return
 
         text_words = re.findall(r"\b\w+\b", content)
+        matched = False
         for word in THANKYOUS:
             if word in text_words:
+                matched = True
                 break
-        else:
+        if not matched:
+            for regex in THANKYOUS_REGEX:
+                if re.search(regex, content):
+                    matched = True
+                    break
+        if not matched:
             return
 
         user_id = data["user_id"]
