@@ -230,7 +230,7 @@ class Extension:
                         text += f"CPU usage: `{cpu_used}%`\n"
                     else:
                         text += "CPU usage: `unknown`\n"
-                    text += f"Ping: `{ping} ms` (1.1.1.1)\n"
+                    text += f"Ping (1.1.1.1): `{ping} ms`\n"
                     text += f"Uptime: `{uptime}`"
                     bat_status, bat_percentage, bat_voltage, bat_current, bat_temperature = stats.get_termux_battery()
                     if bat_status:
@@ -240,7 +240,7 @@ class Extension:
                 elif command_name == "client-stats":
                     response = {"content": "Gathering data..."}
                     self.app.discord.bot_respond_interaction(5, response, interaction_id, interaction_token)   # DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
-                    gateway_events_per_h, gateway_msg_per_h, gateway_ping_time, messages_buffer_size, members_count = self.app.gateway.get_stats()
+                    gateway_events_per_h, gateway_msg_per_h, gateway_ping_time, messages_buffer_size, _ = self.app.gateway.get_stats()
                     total_requests, api_ping_time = self.app.discord.get_stats()
                     deleted_msg_count = 0
                     for channel in self.app.deleted_cache:
@@ -257,7 +257,6 @@ class Extension:
                     text += f"Message buffer size: `{messages_buffer_size}`\n"
                     text += f"Total API requests: `{total_requests}`\n"
                     text += f"API response time: `{api_ping_time} s`\n"
-                    text += f"Cached members: `{members_count}`\n"
                     self.app.discord.bot_edit_interaction({"content": text.strip()}, interaction_token)
 
                 elif command_name == "nom":
