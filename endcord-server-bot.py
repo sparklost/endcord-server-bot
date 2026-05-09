@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import threading
 import time
 
@@ -12,8 +13,8 @@ import stats
 
 # extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.4"
-EXT_ENDCORD_VERSION = "1.4.2"
+EXT_VERSION = "0.1.5"
+EXT_ENDCORD_VERSION = "1.5.0"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
 EXT_COMMAND_ASSIST = (
@@ -250,7 +251,8 @@ class Extension:
                         for channel in guild["channels"]:
                             summaries_count += len(channel["summaries"])
                     pfps_count, pfps_size = utils.get_dir_size(os.path.expanduser(peripherals.cache_path), mb=True)
-                    text = f"Run time: {formatter.format_seconds(int(time.time()) - self.app.start_time, nice=True)}\n"
+                    text = f"Endcord: {peripherals.VERSION}; Python: {sys.version().split(" ")[0]}"
+                    text += f"Run time: {formatter.format_seconds(int(time.time()) - self.app.start_time, nice=True)}\n"
                     text += f"Gateway events/h: `{gateway_events_per_h}`\n"
                     text += f"Gateway messages/h: `{gateway_msg_per_h}`\n"
                     text += f"Gateway ping time: `{gateway_ping_time} s`\n"
