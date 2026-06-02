@@ -235,7 +235,7 @@ class Extension:
                     text += f"Uptime: `{uptime}`"
                     bat_status, bat_percentage, bat_voltage, bat_current, bat_temperature = stats.get_termux_battery()
                     if bat_status:
-                        text += f"\nBattery: {bat_status}; {bat_percentage}%; {bat_voltage} V; {bat_current} mA; {bat_temperature} °C"
+                        text += f"\nBattery: `{bat_status}`; `{bat_percentage}%`; `{bat_voltage} V`; `{bat_current} mA`; `{bat_temperature} °C`"
                     self.app.discord.bot_edit_interaction({"content": text}, interaction_token)
 
                 elif command_name == "client-stats":
@@ -251,14 +251,14 @@ class Extension:
                         for channel in guild["channels"]:
                             summaries_count += len(channel["summaries"])
                     pfps_count, pfps_size = utils.get_dir_size(os.path.expanduser(peripherals.cache_path), mb=True)
-                    text = f"Endcord: {peripherals.VERSION}; Python: {sys.version().split(" ")[0]}"
-                    text += f"Run time: {formatter.format_seconds(int(time.time()) - self.app.start_time, nice=True)}\n"
+                    text = f"Endcord: `{peripherals.VERSION}`; Python: `{sys.version().split(" ")[0]}`"
+                    text += f"Run time: `{formatter.format_seconds(int(time.time()) - self.app.start_time, nice=True)}1`\n"
                     text += f"Gateway events/h: `{gateway_events_per_h}`\n"
                     text += f"Gateway messages/h: `{gateway_msg_per_h}`\n"
-                    text += f"Gateway ping time: `{gateway_ping_time} s`\n"
+                    text += f"Gateway ping time: `{gateway_ping_time}s`\n"
                     text += f"Message buffer size: `{messages_buffer_size}`\n"
                     text += f"Total API requests: `{total_requests}`\n"
-                    text += f"API response time: `{api_ping_time} s`\n"
+                    text += f"API response time: `{api_ping_time}s`\n"
                     self.app.discord.bot_edit_interaction({"content": text.strip()}, interaction_token)
 
                 elif command_name == "nom":
