@@ -15,12 +15,10 @@ class MooncakeStore:
                 if cur.fetchone() is None:
                     cur.execute(f"CREATE DATABASE {dbname}")
                     logger.info(f"Created database: {dbname}")
-
         self.conn = psycopg.connect(host=host, user=user, password=password, dbname=dbname, autocommit=True)
         self.cleanup_conn = psycopg.connect(host=host, user=user, password=password, dbname=dbname, autocommit=True)
         self.init_db()
-
-        self.run  = True
+        self.run = True
 
 
     def init_db(self):
@@ -34,7 +32,7 @@ class MooncakeStore:
                     value BIGINT NOT NULL DEFAULT 0
                 )
             """)
-        logger.info("Postgresql database initializes successfully")
+        logger.info("Postgresql database initialized successfully")
 
 
     def set_value(self, user_id, value):

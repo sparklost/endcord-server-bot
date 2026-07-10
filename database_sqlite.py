@@ -4,17 +4,16 @@ import apsw
 
 logger = logging.getLogger(__name__)
 
+
 class MooncakeStore:
     """Database for user mooncake counts"""
 
     def __init__(self, db_path="pairs.db"):
         self.db_path = db_path
-
         self.conn = apsw.Connection(self.db_path)
         self.cleanup_conn = apsw.Connection(self.db_path)
         self.init_db()
-
-        self.run  = True
+        self.run = True
 
 
     def init_db(self):
@@ -28,7 +27,7 @@ class MooncakeStore:
                 value INTEGER NOT NULL DEFAULT 0
             )
         """)
-        logger.info("Sqlite database initializes successfully")
+        logger.info("Sqlite database initialized successfully")
 
 
     def set_value(self, user_id, value):
