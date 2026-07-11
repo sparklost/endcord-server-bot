@@ -1,10 +1,9 @@
-# Project dependencies
-apsw/
-
 # Misc
 THIRD_PARTY_LICENSES.txt
 .debris
 .megaignore
+apsw/
+psycopg/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -17,7 +17,9 @@ See [official extensions documentation](https://github.com/sparklost/endcord/blo
 Available options:
 - Git clone into `Extensions` directory located in endcord config directory.
 - Run `endcord -i https://github.com/sparklost/endcord-bot`
-- Or use endcord client-side command `install_extension sparklost/endcord-bot`
+- Or use endcord client-side command `install_extension sparklost/endcord-bot`  
+
+To use postgresql in termux, first install `postgresql`, `cmake` and `clang`. Then install this extension.
 
 
 ## Configuration
