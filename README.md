@@ -40,7 +40,7 @@ Note that there is a limit of 200 command registrations per day.
 
 
 ## Disclaimer
-This extension is usable only by bots which should not be breaking any ToS, byt here's a warning anyway:  
+This extension is usable only by bots which should not be breaking any ToS, but here's a warning anyway:  
 > [!WARNING]
 > Using third-party client is against Discord's Terms of Service and may cause your account to be banned!  
 > **Use endcord and/or this extension at your own risk!**  
