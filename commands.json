@@ -48,7 +48,14 @@
     "description": "Show client stats"
   },
   {
+    "name": "docbot-update",
+    "type": 1,
+    "admin": true,
+    "description": "Update docs to latest git commit for documentation bot"
+  },
+  {
     "name": "ssh",
+    "admin": true,
     "description": "Manage server ssh daemon states",
     "options": [
       {

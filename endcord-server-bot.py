@@ -13,7 +13,7 @@ import stats
 
 # extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.6"
+EXT_VERSION = "0.1.7"
 EXT_ENDCORD_VERSION = "1.5.0"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
@@ -71,6 +71,10 @@ class Extension:
 
         extension_dir = os.path.dirname(os.path.abspath(__file__))
         self.commands = utils.load_json("commands.json", dir_path=extension_dir)
+        self.admin_commands = []
+        for command in self.commands:
+            if "admin" in command:
+                self.admin_commands.append(command["name"])
         # self.command_perms = utils.load_json("command_perms.json", dir_path=extension_dir)
         self.cooldown = {}
         self.members_nonce = None
@@ -127,6 +131,8 @@ class Extension:
             if not self.commands:
                 return False
             for num, command in enumerate(self.commands):
+                if "admin" in command:
+                    command.pop("admin")
                 command_id = self.app.discord.bot_register_command(command)
                 if command_id and command_id is not True:
                     self.commands[num]["id"] = command_id
@@ -218,6 +224,15 @@ class Extension:
             elif interaction["type"] == 2:   # APPLICATION_COMMAND
                 command_name = data["name"]
                 user_id = interaction["member"]["user"]["id"]
+
+                if command_name in self.admin_commands and user_id != self.admin_id:
+                    response = {
+                        "content": "You are not allowed to run this command.",
+                        "flags": 1 << 6,
+                    }
+                    self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
+                    continue
+
                 if command_name == "ping":
                     response = {"content": "Pong!"}
                     self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)   # CHANNEL_MESSAGE_WITH_SOURCE
@@ -351,14 +366,14 @@ class Extension:
                     response = {"content": text.strip("\n")}
                     self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
 
+                elif command_name == "docbot-update":
+                    response = {"content": "Updating docbot RAG database..."}
+                    self.app.discord.bot_respond_interaction(5, response, interaction_id, interaction_token)   # DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+                    self.app.execute_command(0, None, "docbot_update_wait", 0, 0)
+                    response = {"content": "Docbot RAG database updated successfully"}
+                    self.app.discord.bot_edit_interaction(response, interaction_token)
+
                 elif command_name == "ssh":
-                    if user_id != self.admin_id:
-                        response = {
-                            "content": "You are not allowed to run this command.",
-                            "flags": 1 << 6,
-                        }
-                        self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
-                        continue
                     if "options" in data and data["options"][0]["name"] == "tor":
                         if not shutil.which("ssh-tor"):
                             response = {
