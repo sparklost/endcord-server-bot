@@ -12,6 +12,6 @@ else
     ONION=$(cat ~/.tor/torssh/hostname)
     echo "Address: \`$ONION\`"
     echo "Port: \`22\`"
-    echo "Username: \`$USER\`"
+    echo "Username: \`$(whoami)\`"
+    echo "Command: \`ssh -p 22 $(whoami)@$ONION\`"
 fi
-

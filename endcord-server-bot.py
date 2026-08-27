@@ -13,7 +13,7 @@ import stats
 
 # extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.7"
+EXT_VERSION = "0.1.8"
 EXT_ENDCORD_VERSION = "1.5.0"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
@@ -392,7 +392,7 @@ class Extension:
                             "flags": 1 << 6,
                         }
                         if not response["content"]:
-                            response["content"] = f"Command {" ".join(cmd)} executed successfully"
+                            response["content"] = "TOR ssh server stopped successfully"
                         self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
                     elif "options" in data and data["options"][0]["name"] == "ngrok":
                         if not shutil.which("ssh-ngrok"):
@@ -412,7 +412,7 @@ class Extension:
                             "flags": 1 << 6,
                         }
                         if not response["content"]:
-                            response["content"] = f"Command {" ".join(cmd)} executed successfully"
+                            response["content"] = "Ngrok ssh server successfully"
                         self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
                     else:
                         response = {

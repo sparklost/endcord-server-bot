@@ -23,5 +23,6 @@ else
     PORT=$(echo "$ADDR" | sed 's|tcp://||' | cut -d: -f2)
     echo "Address: \`$HOST\`"
     echo "Port: \`$PORT\`"
-    echo "Username: \`$USERNAME\`"
+    echo "Username: \`$(whoami)\`"
+    echo "Command: \`ssh -p $PORT $(whoami)@$HOST\`"
 fi
