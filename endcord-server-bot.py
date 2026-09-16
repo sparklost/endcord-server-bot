@@ -13,19 +13,17 @@ import stats
 
 # extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.1.8"
+EXT_VERSION = "0.2.0"
 EXT_ENDCORD_VERSION = "1.5.0"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
-EXT_COMMAND_ASSIST = (
-    ("bot_register_commands - register all bot commands from commands.json", "bot_register_commands"),
-    ("bot_toggle_ui - toggle UI drawing", "bot_toggle_ui"),
-)
+EXT_COMMAND_ASSIST = (("bot_register_commands - register all bot commands from commands.json", "bot_register_commands"), )
 logger = logging.getLogger(__name__)
 
 THANKYOUS = ("thank you", "thankyou", "thanks", "ty", "tysm", "thx", "tnx", "tyy", "thanx")
 THANKYOUS_REGEX = [r"\bthank you\b"]
 BATTERY_CHECK_INTERVAL = 10 * 60
+MANAGE_DELAY = 3
 
 for i, regex in enumerate(THANKYOUS_REGEX):
     THANKYOUS_REGEX[i] = re.compile(regex, re.IGNORECASE)
@@ -80,13 +78,13 @@ class Extension:
         self.members_nonce = None
         self.start_time = int(time.time())
 
-        self.ui = True
-        if not app.config.get("ext_endcord_server_bot_ui", True):
-            if self.ui:
-                self.app.tui.pause_curses()
-            else:
-                self.app.tui.resume_curses()
-            self.ui = not self.ui
+        if utils.detect_runtime() == "source":
+            main_module = sys.modules.get("__main__")
+            if hasattr(main_module, "__file__") and main_module.__file__:
+                self.project_root = os.path.dirname(main_module.__file__)
+        else:
+            self.project_root = None
+            logger.warning("Manage-server commands will not work on non-source runtime")
 
         threading.Thread(target=self.bot, daemon=True).start()
 
@@ -142,12 +140,6 @@ class Extension:
                 time.sleep(2)   # to not get rate_limited
             self.app.update_extra_line()
             return True
-        if command_text.startswith("bot_toggle_ui"):
-            if self.ui:
-                self.app.tui.pause_curses()
-            else:
-                self.app.tui.resume_curses()
-            self.ui = not self.ui
         return False
 
 
@@ -374,12 +366,10 @@ class Extension:
                     self.app.discord.bot_edit_interaction(response, interaction_token)
 
                 elif command_name == "ssh":
+                    response = {"flags": 1 << 6}
                     if "options" in data and data["options"][0]["name"] == "tor":
                         if not shutil.which("ssh-tor"):
-                            response = {
-                                "content": "ssh-tor script is missing",
-                                "flags": 1 << 6,
-                            }
+                            response["content"] = "ssh-tor script is missing"
                             self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
                             continue
                         if data["options"][0]["value"] == "start":
@@ -387,19 +377,13 @@ class Extension:
                         else:
                             cmd = ["ssh-tor", "--stop"]
                         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-                        response = {
-                            "content": result.stdout + result.stderr,
-                            "flags": 1 << 6,
-                        }
+                        response["content"] = result.stdout + result.stderr
                         if not response["content"]:
                             response["content"] = "TOR ssh server stopped successfully"
                         self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
                     elif "options" in data and data["options"][0]["name"] == "ngrok":
                         if not shutil.which("ssh-ngrok"):
-                            response = {
-                                "content": "ssh-ngrok script is missing",
-                                "flags": 1 << 6,
-                            }
+                            response["content"] = "ssh-ngrok script is missing"
                             self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
                             continue
                         if data["options"][0]["value"] == "start":
@@ -407,16 +391,37 @@ class Extension:
                         else:
                             cmd = ["ssh-ngrok", "--stop"]
                         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-                        response = {
-                            "content": result.stdout + result.stderr,
-                            "flags": 1 << 6,
-                        }
+                        response["content"] = result.stdout + result.stderr
                         if not response["content"]:
-                            response["content"] = "Ngrok ssh server successfully"
+                            response["content"] = "Ngrok ssh server stopped successfully"
                         self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
                     else:
-                        response = {
-                            "content": "Specify at least one option.",
-                            "flags": 1 << 6,
-                        }
+                        response["content"] = "Specify at least one option."
                         self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
+
+                elif command_name == "manage-server" and "options" in data:
+                    if not shutil.which("manage-endcord"):
+                        response = {"content": "manage-endcord script is missing"}
+                        self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
+                        continue
+                    if not self.project_root:
+                        response = {"content": "Server is not running from source, manage-server commands cannot be used"}
+                        self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
+                        continue
+                    if data["options"][0]["name"] == "restart":
+                        response = {"content": f"Server (endcord) will restart in {MANAGE_DELAY}s"}
+                    elif data["options"][0]["name"] == "restart-update":
+                        response = {"content": f"Server (endcord) will restart and update in {MANAGE_DELAY}s"}
+                    elif data["options"][0]["name"] == "stop":
+                        response = {"content": f"Server (endcord) will stop in {MANAGE_DELAY}s"}
+                    else:
+                        continue
+                    self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
+                    time.sleep(MANAGE_DELAY)
+                    subprocess.Popen(
+                        ["manage-endcord", self.project_root, data["options"][0]["name"]],
+                        start_new_session=True,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        stdin=subprocess.DEVNULL,
+                    )

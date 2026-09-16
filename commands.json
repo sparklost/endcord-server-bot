@@ -91,5 +91,30 @@
         ]
       }
     ]
+  },
+  {
+    "name": "manage-server",
+    "admin": true,
+    "description": "Manage server process",
+    "options": [
+      {
+        "name": "restart",
+        "description": "Restart server",
+        "type": 1,
+        "required": false
+      },
+      {
+        "name": "restart-update",
+        "description": "Restart and update server",
+        "type": 1,
+        "required": false
+      },
+      {
+        "name": "stop",
+        "description": "Stop server",
+        "type": 1,
+        "required": false
+      }
+    ]
   }
 ]

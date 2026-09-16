@@ -1,5 +1,5 @@
 # endcord-server-bot
-An extension for [endcord](https://github.com/sparklost/endcord) discord TUI client, that implements bot used in [Endcord Testing Ground](https://discord.gg/judQSxw5K2) server.  
+An extension for [endcord](https://github.com/sparklost/endcord) discord TUI client, that implements bot used in [Endcord server](https://discord.gg/judQSxw5K2).  
 This extension is intended **for bots only**.  
 
 
@@ -32,7 +32,6 @@ Note that there is a limit of 200 command registrations per day.
 - `ext_endcord_server_bot_guild_id = None`  
 - `ext_endcord_server_bot_admin_id = None`  
 - `ext_endcord_server_bot_mooncake_cooldown = 15`  
-- `ext_endcord_server_bot_ui = True`  
 - `ext_endcord_server_bot_db_postgresql_host = None`  
 - `ext_endcord_server_bot_db_postgresql_user = "user"`  
 - `ext_endcord_server_bot_db_postgresql_password = "password"`  
