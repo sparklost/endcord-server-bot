@@ -38,6 +38,11 @@
     "description": "Replies with Pong!"
   },
   {
+    "name": "help",
+    "type": 1,
+    "description": "Show bot help message"
+  },
+  {
     "name": "system-stats",
     "type": 1,
     "description": "Show system stats"

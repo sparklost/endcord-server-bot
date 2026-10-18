@@ -13,7 +13,7 @@ import stats
 
 # extra deps: apsw psycopg[binary,pool]
 EXT_NAME = "Endcord Server Bot"
-EXT_VERSION = "0.2.0"
+EXT_VERSION = "0.2.1"
 EXT_ENDCORD_VERSION = "1.5.0"
 EXT_DESCRIPTION = "Custom discord bot for official Endcord server"
 EXT_SOURCE = "https://github.com/sparklost/endcord-server-bot"
@@ -44,8 +44,14 @@ class Extension:
 
         self.guild_id = app.config.get("ext_endcord_server_bot_guild_id", None)
         self.admin_id = app.config.get("ext_endcord_server_bot_admin_id", None)
+        self.help_trigger = app.config.get("ext_endcord_server_bot_help_trigger", "!help")
+        self.help_text = app.config.get("ext_endcord_server_bot_help_text", "Placeholder Help Text")
         self.alerts_channel = app.config.get("ext_endcord_server_bot_alerts_channel_id", None)
         self.mooncake_cooldown = app.config.get("ext_endcord_server_bot_mooncake_cooldown", 15) * 60   # default 15 min
+
+        if self.help_text and os.path.exists(self.help_text):
+            with open(self.help_text, "r", encoding="utf-8") as f:
+                self.help_text = f.read()
 
         if app.config.get("ext_endcord_server_bot_db_postgresql_host", None):
             import database_postgres
@@ -123,6 +129,12 @@ class Extension:
             time.sleep(BATTERY_CHECK_INTERVAL)
 
 
+    def on_main_start(self):
+        """At this point there is app.my_id so update trigger"""
+        if self.trigger and self.trigger.startswith("@me"):
+            self.trigger = self.trigger[3:] + f"<@{self.app.my_id}>"
+
+
     def on_execute_command(self, command_text, chat_sel, tree_sel):   # noqa
         """Handle commands"""
         if command_text.startswith("bot_register_commands"):
@@ -154,6 +166,10 @@ class Extension:
             return
 
         data = new_message["d"]
+        if self.trigger and data["content"].startswith(self.trigger):
+            self.app.discord.send_message(data["channel_id"], self.help_text)
+            return
+
         if not data["mentions"]:
             return
 
@@ -201,6 +217,7 @@ class Extension:
                 f"**{name}** received a *thank you* mooncake!",
             )
 
+
     def bot(self):
         """Main bot loop"""
         while self.run:
@@ -228,6 +245,10 @@ class Extension:
                 if command_name == "ping":
                     response = {"content": "Pong!"}
                     self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)   # CHANNEL_MESSAGE_WITH_SOURCE
+
+                elif command_name == "help":
+                    response = {"content": self.help_text}
+                    self.app.discord.bot_respond_interaction(4, response, interaction_id, interaction_token)
 
                 elif command_name == "system-stats":
                     response = {"content": "Gathering data..."}
