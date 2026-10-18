@@ -39,7 +39,7 @@ class Extension:
         if not self.app.token.startswith("Bot"):
             logger.info("Not running on user accounts!")
             self.run = False
-            del (type(self).on_execute_command, type(self).on_message_event, type(self).on_message_event_is_irrelevant)
+            del (type(self).on_execute_command, type(self).on_message_event, type(self).on_message_event_is_irrelevant, type(self).on_main_start)
             return
 
         self.guild_id = app.config.get("ext_endcord_server_bot_guild_id", None)
