@@ -49,8 +49,8 @@ class Extension:
         self.alerts_channel = app.config.get("ext_endcord_server_bot_alerts_channel_id", None)
         self.mooncake_cooldown = app.config.get("ext_endcord_server_bot_mooncake_cooldown", 15) * 60   # default 15 min
 
-        if self.help_text and os.path.exists(self.help_text):
-            with open(self.help_text, "r", encoding="utf-8") as f:
+        if self.help_text and os.path.exists(os.path.expanduser(self.help_text)):
+            with open(os.path.expanduser(self.help_text), "r", encoding="utf-8") as f:
                 self.help_text = f.read()
 
         if app.config.get("ext_endcord_server_bot_db_postgresql_host", None):
@@ -131,8 +131,8 @@ class Extension:
 
     def on_main_start(self):
         """At this point there is app.my_id so update trigger"""
-        if self.trigger and self.trigger.startswith("@me"):
-            self.trigger = self.trigger[3:] + f"<@{self.app.my_id}>"
+        if self.help_trigger and self.help_trigger.startswith("@me"):
+            self.help_trigger = self.help_trigger[3:] + f"<@{self.app.my_id}>"
 
 
     def on_execute_command(self, command_text, chat_sel, tree_sel):   # noqa
@@ -166,7 +166,7 @@ class Extension:
             return
 
         data = new_message["d"]
-        if self.trigger and data["content"].startswith(self.trigger):
+        if self.help_trigger and data["content"].startswith(self.help_trigger):
             self.app.discord.send_message(data["channel_id"], self.help_text)
             return
 
