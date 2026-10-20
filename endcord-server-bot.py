@@ -279,7 +279,7 @@ class Extension:
                         for channel in guild["channels"]:
                             summaries_count += len(channel["summaries"])
                     pfps_count, pfps_size = utils.get_dir_size(os.path.expanduser(peripherals.cache_path), mb=True)
-                    text = f"Endcord: `{peripherals.VERSION}`; Python: `{sys.version().split(" ")[0]}`"
+                    text = f"Endcord: `{peripherals.VERSION}`; Python: `{sys.version.split(" ")[0]}`"
                     text += f"Run time: `{formatter.format_seconds(int(time.time()) - self.app.start_time, nice=True)}1`\n"
                     text += f"Gateway events/h: `{gateway_events_per_h}`\n"
                     text += f"Gateway messages/h: `{gateway_msg_per_h}`\n"
