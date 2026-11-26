@@ -5,8 +5,8 @@ import stat
 import subprocess
 import sys
 
-PACKAGES = ["apsw==3.53.3.1", "psycopg==3.3.4"]
-TERMUX_PACKAGES = ["apsw"]
+PACKAGES = ["psycopg==3.3.4"]
+TERMUX_PACKAGES = []
 SCRIPTS = ["manage-endcord.sh", "ssh-ngrok.sh", "ssh-tor.sh"]
 
 
